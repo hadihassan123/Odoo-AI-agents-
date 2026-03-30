@@ -1,37 +1,137 @@
-# Odoo
+# AI Studio Backend
 
-[![Build Status](https://runbot.odoo.com/runbot/badge/flat/1/master.svg)](https://runbot.odoo.com/runbot)
-[![Tech Doc](https://img.shields.io/badge/master-docs-875A7B.svg?style=flat&colorA=8F8F8F)](https://www.odoo.com/documentation/master)
-[![Help](https://img.shields.io/badge/master-help-875A7B.svg?style=flat&colorA=8F8F8F)](https://www.odoo.com/forum/help-1)
-[![Nightly Builds](https://img.shields.io/badge/master-nightly-875A7B.svg?style=flat&colorA=8F8F8F)](https://nightly.odoo.com/)
+Standalone FastAPI service for AI Studio so Odoo 19 can call it over HTTP instead of embedding the AI code inside `custom_addons`.
 
-Odoo is a suite of web based open source business apps.
+## What it provides
 
-The main Odoo Apps include an [Open Source CRM](https://www.odoo.com/page/crm),
-[Website Builder](https://www.odoo.com/app/website),
-[eCommerce](https://www.odoo.com/app/ecommerce),
-[Warehouse Management](https://www.odoo.com/app/inventory),
-[Project Management](https://www.odoo.com/app/project),
-[Billing &amp; Accounting](https://www.odoo.com/app/accounting),
-[Point of Sale](https://www.odoo.com/app/point-of-sale-shop),
-[Human Resources](https://www.odoo.com/app/employees),
-[Marketing](https://www.odoo.com/app/social-marketing),
-[Manufacturing](https://www.odoo.com/app/manufacturing),
-[...](https://www.odoo.com/)
+- `POST /api/v1/chat`
+- `GET /api/v1/chat/history`
+- `GET /health`
+- `POST /ai/chat` for old Odoo widget compatibility
+- `POST /ai_studio/send` for old AI Studio controller compatibility
 
-Odoo Apps can be used as stand-alone applications, but they also integrate seamlessly so you get
-a full-featured [Open Source ERP](https://www.odoo.com) when you install several Apps.
+The service stores chat records in SQLite by default and can be switched to PostgreSQL by setting `DATABASE_URL`.
+If `SERVICE_API_KEY` is set, chat endpoints require `X-API-Key`.
 
-## Getting started with Odoo
+## Local run
 
-For a standard installation please follow the [Setup instructions](https://www.odoo.com/documentation/master/administration/install/install.html)
-from the documentation.
+1. Create an env file:
 
-To learn the software, we recommend the [Odoo eLearning](https://www.odoo.com/slides),
-or [Scale-up, the business game](https://www.odoo.com/page/scale-up-business-game).
-Developers can start with [the developer tutorials](https://www.odoo.com/documentation/master/developer/howtos.html).
+```bash
+cp .env.example .env
+```
 
-## Security
+2. Set at least one provider key in `.env`:
 
-If you believe you have found a security issue, check our [Responsible Disclosure page](https://www.odoo.com/security-report)
-for details and get in touch with us via email.
+- `GROQ_API_KEY`
+- `OPENROUTER_API_KEY`
+
+Also set:
+
+- `SERVICE_API_KEY` for requests coming from Odoo
+
+3. Install dependencies and run:
+
+```bash
+.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+You can also use the settings from `.env` directly:
+
+```bash
+.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+## Odoo 19 integration
+
+Configure your Odoo addon to call:
+
+- Base URL: `http://127.0.0.1:8000`
+- Health: `GET /health`
+- Chat: `POST /api/v1/chat`
+- Header: `X-API-Key: <SERVICE_API_KEY>`
+
+Legacy Odoo-compatible routes also exist:
+
+- `POST /ai/chat` returns `{"reply": "..."}`
+- `POST /ai_studio/send` returns `{"response": "..."}`
+
+These match the current controller response shapes in your Odoo addon, but Odoo will not use them automatically unless you reroute or update the Odoo side to send requests here.
+
+Example request body:
+
+```json
+{
+  "message": "Summarize this sales order issue",
+  "model": "groq",
+  "mode": "general",
+  "session_id": "odoo-user-42",
+  "user_id": "42",
+  "context": "Optional Odoo business context",
+  "metadata": {
+    "source": "odoo19",
+    "model_name": "sale.order"
+  },
+  "history": [
+    {"role": "user", "content": "Earlier prompt"},
+    {"role": "assistant", "content": "Earlier reply"}
+  ]
+}
+```
+
+Example response:
+
+```json
+{
+  "id": 1,
+  "response": "AI response text",
+  "session_id": "odoo-user-42",
+  "user_id": "42",
+  "model": "groq",
+  "mode": "general"
+}
+```
+
+Minimal Odoo-side Python request shape:
+
+```python
+import requests
+
+response = requests.post(
+    "http://127.0.0.1:8000/api/v1/chat",
+    headers={"X-API-Key": "your-shared-key"},
+    json={
+        "message": prompt,
+        "model": "groq",
+        "mode": "general",
+        "session_id": f"odoo-user-{user_id}",
+        "user_id": str(user_id),
+        "context": business_context,
+        "history": history,
+    },
+    timeout=60,
+)
+response.raise_for_status()
+payload = response.json()
+answer = payload["response"]
+```
+
+## Important integration constraint
+
+Your current Odoo code does not call an external backend. It serves `/ai/chat` inside Odoo and then calls `request.env['ai.studio']` and `request.env['ai.studio.chat']` directly.
+
+That means this backend can be made compatible, but Odoo will not start using it until one of these happens:
+
+1. You change the Odoo addon to call this backend over HTTP.
+2. You place a reverse proxy in front of Odoo and route `/ai/chat` or `/ai_studio/send` away from Odoo to this backend.
+3. You disable the Odoo controller and expose this backend to the frontend under the same path through your local web stack.
+
+Without one of those manual steps, zero Odoo-code changes is not technically possible.
+
+## Production notes
+
+- Bind to `127.0.0.1` if only local Odoo should access it.
+- Use PostgreSQL instead of SQLite if you expect concurrent writes or multiple users.
+- Disable docs in production with `ENABLE_DOCS=false`.
+- Restrict `CORS_ORIGINS` to the Odoo host you actually use.
+- Set a strong `SERVICE_API_KEY` before wiring Odoo to this service.

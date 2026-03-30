@@ -1,8 +1,0 @@
-[project]
-name = "odoo-ai"
-version = "0.1.0"
-description = "Standalone terminal AI Studio for Odoo workflows"
-requires-python = ">=3.10"
-
-[project.scripts]
-odoo-ai = "odoo_ai.main:main"
