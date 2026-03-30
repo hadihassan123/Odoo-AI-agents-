@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_hotel_ai_studio_root"
+                  name="AI Studio"
+                  sequence="99"
+                  web_icon="hotel_ai_studio,static/src/img/icon.png"/>
+
+        <menuitem id="menu_hotel_ai_studio"
+                  name="Chat"
+                  parent="menu_hotel_ai_studio_root"
+                  action="ai_studio_action"
+                  sequence="1"/>
+    </data>
+</odoo>

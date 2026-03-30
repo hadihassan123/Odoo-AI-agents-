@@ -1,0 +1,213 @@
+.o_web_client #hotel-ai-studio-chat-root {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1100;
+    font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-toggle {
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0f766e, #155e75);
+    color: #fff;
+    padding: 14px 20px;
+    font-weight: 700;
+    box-shadow: 0 12px 30px rgba(15, 118, 110, 0.28);
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-panel {
+    display: none;
+    width: 380px;
+    height: 560px;
+    margin-top: 12px;
+    border-radius: 22px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at top left, rgba(20, 184, 166, 0.18), transparent 38%),
+        linear-gradient(180deg, #f8fafc, #eef6f4);
+    border: 1px solid rgba(15, 118, 110, 0.18);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+.o_web_client #hotel-ai-studio-chat-root.is-open .hai-panel {
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto auto;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 12px;
+    padding: 18px 18px 10px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-header p {
+    margin: 4px 0 0;
+    color: #475569;
+    font-size: 13px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-close,
+.o_web_client #hotel-ai-studio-chat-root .hai-clear,
+.o_web_client #hotel-ai-studio-chat-root .hai-send {
+    border: 0;
+    border-radius: 12px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-close {
+    width: 34px;
+    height: 34px;
+    background: rgba(15, 23, 42, 0.06);
+    color: #0f172a;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-toolbar {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    padding: 0 18px 12px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-mode {
+    flex: 1 1 auto;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-mode span {
+    display: block;
+    font-size: 12px;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-mode-select {
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 118, 110, 0.25);
+    padding: 10px 12px;
+    background: #fff;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-clear {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 10px 14px;
+    font-weight: 600;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-slave-tip {
+    margin: 0 18px 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(20, 184, 166, 0.12);
+    color: #0f766e;
+    font-size: 13px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-messages {
+    overflow-y: auto;
+    padding: 0 18px 10px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-empty {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 14px;
+    padding: 24px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-message {
+    margin-bottom: 12px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-message.is-user {
+    text-align: right;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-badge {
+    margin-bottom: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-bubble {
+    display: inline-block;
+    max-width: 88%;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+    text-align: left;
+    word-break: break-word;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-message.is-user .hai-bubble {
+    background: linear-gradient(135deg, #0f766e, #155e75);
+    color: #fff;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-status {
+    min-height: 22px;
+    padding: 0 18px 8px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-composer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding: 0 18px 18px;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-input {
+    resize: none;
+    min-height: 78px;
+    border-radius: 16px;
+    border: 1px solid rgba(15, 118, 110, 0.2);
+    padding: 12px 14px;
+    background: #fff;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-send {
+    align-self: end;
+    background: #0f766e;
+    color: #fff;
+    padding: 12px 16px;
+    font-weight: 700;
+}
+
+.o_web_client #hotel-ai-studio-chat-root .hai-send:disabled,
+.o_web_client #hotel-ai-studio-chat-root .hai-input:disabled {
+    opacity: 0.65;
+}
+
+@media (max-width: 768px) {
+    .o_web_client #hotel-ai-studio-chat-root {
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+    }
+
+    .o_web_client #hotel-ai-studio-chat-root .hai-panel {
+        width: auto;
+        height: 70vh;
+    }
+}

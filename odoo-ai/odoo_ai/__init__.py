@@ -1,0 +1,1 @@
+"""Standalone terminal AI project."""
